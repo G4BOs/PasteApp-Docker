@@ -1,0 +1,12 @@
+# Entorno virtual
+.venv
+
+# Variables de entorno
+.env
+
+# Python archivos temporales
+__pycache__/ 
+
+# Carpeta de archivos
+uploads/*
+
