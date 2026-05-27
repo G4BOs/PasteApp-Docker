@@ -8,5 +8,11 @@
 __pycache__/ 
 
 # Carpeta de archivos
-uploads/*
+app/uploads
+
+#Certificados de vapid
+*.pem
+
+#Certificados de mkcert
+certs/
 
