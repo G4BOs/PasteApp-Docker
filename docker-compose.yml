@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: g4bos/pasteapp:latest
     env_file: .env
     volumes:
       - ./app/uploads:/project/app/uploads
