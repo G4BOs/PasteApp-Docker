@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------\
-from fastapi import FastAPI, Request, UploadFile, File
+from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from .moduls import wp_modul
+import shutil
 # ------------------------------------------------------------------/
 
 app = FastAPI()
@@ -37,7 +38,7 @@ def cargar_nombre():
     global archivo_name
     try:
         with open("app/uploads/info.txt", "r") as f:
-            archivo_name = f.read()
+            archivo_name = f.read().strip()
     except FileNotFoundError:
         archivo_name = ''
         with open("app/uploads/info.txt", "w") as f:
@@ -96,14 +97,50 @@ async def notificar(request: Request):
 
 
 
-@app.post("/upload")
-async def upload(archivo: UploadFile = File(...) ):
-    with open("app/uploads/archivo", "wb") as f:
-        f.write(await archivo.read())
-    with open("app/uploads/info.txt", "w") as f:
-        f.write(archivo.filename or "noname")
-    cargar_nombre()
-    await sio.emit("ult_archivo", archivo_name)
+#@app.post("/upload")
+#async def upload(archivo: UploadFile = File(...) ):
+#    with open("app/uploads/archivo", "wb") as f:
+#        f.write(await archivo.read())
+#    with open("app/uploads/info.txt", "w") as f:
+#        f.write(archivo.filename or "noname")
+#    cargar_nombre()
+#    await sio.emit("ult_archivo", archivo_name)
+
+UPLOAD_DIR = "/project/app/uploads"
+
+@app.post("/upload-chunk")
+async def upload_chunk(
+        archivo_chunk: UploadFile = File(...),
+        filename: str = Form(...),
+        chunkIndex: int = Form(...),
+        totalChunks: int = Form(...),
+        uploadId: str = Form(...)
+):
+    file_path = os.path.join(UPLOAD_DIR,"archivo")
+
+    try:
+        mode = "wb" if chunkIndex == 0 else "r+b"
+        with open(file_path, mode) as f:
+            if chunkIndex > 0:
+                TAMANO_CHUNK = 5 * 1024 * 1024
+                f.seek(chunkIndex*TAMANO_CHUNK)
+            shutil.copyfileobj(archivo_chunk.file, f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error escribiendo el fragmento {str(e)}")
+    finally:
+        await archivo_chunk.close()
+    
+
+    if chunkIndex + 1 == totalChunks:
+        with open("app/uploads/info.txt", "w") as f:
+            f.write(filename or "noname")
+        cargar_nombre()
+        await sio.emit("ult_archivo", archivo_name)
+
+        print(f"Subida completada con exito: {filename}")
+        return {"status": "completed", "message": "archivo ensamblado", "filename": filename}
+    return {"status": "chunk_saved", "chunkIndex":chunkIndex}
+
 
 @app.get("/download")
 async def download():
@@ -111,18 +148,43 @@ async def download():
         with open("app/uploads/archivo", "rb") as f:
             while chunk := f.read(2048*2048):
                 yield chunk
-    headers = {"Content-Disposition": f"attachment; filename={archivo_name}"}
-    return StreamingResponse(iterar(), headers=headers)
+    headers = {"Content-Disposition": f'attachment; filename="{archivo_name}"'}
+    return StreamingResponse(iterar(), headers=headers, media_type="application/octet-stream")
 
 
 
 @app.get("/video")
-async def get_video():
+async def get_video(request: Request):
+    file_path = "app/uploads/archivo"
+    file_size = os.path.getsize(file_path)
+    
+    range_header = request.headers.get("Range")
+
+    if range_header:
+        h = range_header.replace("bytes=","").split("-")
+        start = int(h[0])
+        end = int(h[1]) if h[1] else file_size -1
+    else:
+        start = 0
+        end = file_size -1
+
     def iterar():
-        with open("app/uploads/archivo", "rb") as f:
-            while chunk := f.read(1024*1024):
+        with open(file_path, "rb") as f:
+            f.seek(start)
+            remaining = end - start + 1
+            while remaining > 0:
+                chunk = f.read( min(1024*1024,remaining) )
+                if not chunk:
+                    break
+                remaining -= len(chunk)
                 yield chunk
-    return StreamingResponse(iterar(),media_type="video/mp4")
+    headers = {
+        "Content-Range": f"bytes {start}-{end}/{file_size}",
+        "Acept-Ranges": "bytes",
+        "Content-Length": str(end-start+1),
+    }
+    status_code = 206 if range_header else 200
+    return StreamingResponse(iterar(),status_code=status_code,headers=headers,media_type="video/mp4")
 
 
 

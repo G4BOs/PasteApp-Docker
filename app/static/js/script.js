@@ -184,22 +184,48 @@ socket.on('ult_archivo', (data) => {
 });
 
 //SUBIR ARCHIVO --------------------------------------------------|
-const xhr = new XMLHttpRequest();
-xhr.upload.onprogress = function(e) {
-  const porcentaje = Math.round((e.loaded / e.total) * 100);
-  progress_barr.style.width = `${porcentaje}%`;
-  progress_barr.innerText = `${porcentaje}%`
-};
+//const xhr = new XMLHttpRequest();
+//xhr.upload.onprogress = function(e) {
+//  const porcentaje = Math.round((e.loaded / e.total) * 100);
+//  progress_barr.style.width = `${porcentaje}%`;
+//  progress_barr.innerText = `${porcentaje}%`
+//};
 
 // ---------------------------------------------------------------|
 
-const input_file = document.querySelector("#input_file");
 btn_subir.addEventListener('click', () => { subir() });
-function subir() {
-  const formData = new FormData();
-  formData.append('archivo', input_file.files[0]);
-  xhr.open('POST', '/upload');
-  xhr.send(formData);
+
+async function subir() {
+  const input_file = document.querySelector("#input_file");
+  const file = input_file.files[0];
+  if (!file) return;
+  const TAMANO_CHUNK = 5 * 1024 * 1024;
+  const totalChunks = Math.ceil(file.size / TAMANO_CHUNK);
+  const uuidUnico = crypto.randomUUID();
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const inicio = chunkIndex * TAMANO_CHUNK;
+    const fin = Math.min(inicio + TAMANO_CHUNK, file.size);
+
+    const chunk = file.slice(inicio, fin);
+    const formData = new FormData();
+    formData.append('archivo_chunk', chunk);
+    formData.append('filename', file.name);
+    formData.append('chunkIndex', chunkIndex);
+    formData.append('totalChunks', totalChunks);
+    formData.append('uploadId', uuidUnico);
+
+    await enviarChunk(formData);
+    const porcentaje = Math.round(((chunkIndex + 1) / totalChunks) * 100);
+    progress_barr.style.width = `${porcentaje}%`;
+    progress_barr.innerText = `${porcentaje}%`;
+  }
+};
+
+function enviarChunk(formData) {
+  return fetch('/upload-chunk', {
+    method: 'POST',
+    body: formData
+  })
 };
 // ---------------------------------------------------------------|
 
