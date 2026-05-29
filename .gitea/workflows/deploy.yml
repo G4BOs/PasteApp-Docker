@@ -1,0 +1,29 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build image
+        run: docker compose build
+
+      - name: Push image
+        run: docker push g4bos/pasteapp:latest
+
+      - name: Deploy
+        run: |
+          cd "${{ secrets.APP_PATH }}"
+          docker compose pull
+          docker compose up -d
