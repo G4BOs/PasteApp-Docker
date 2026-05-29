@@ -29,4 +29,3 @@ VAPID_PRIVATE_KEY=
 VAPID_MAIL=
 ```
 
-prueba.
