@@ -24,6 +24,6 @@ jobs:
 
       - name: Deploy
         run: |
-          cd "${{ secrets.APP_PATH }}"
+          cd "${{secrets.APP_PATH}}"
           docker compose pull
           docker compose up -d
