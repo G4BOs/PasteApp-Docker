@@ -19,7 +19,6 @@ services:
         target: /etc/nginx/conf.d/default.conf
         read_only: true
       - ./certs:/etc/nginx/certs
-      - static_content:/usr/share/nginx/html/static:ro
     depends_on:
       - app
     restart: unless-stopped
