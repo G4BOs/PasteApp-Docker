@@ -49,7 +49,7 @@ cargar_nombre()
 def tipo_de_archivo(archivo):
     formats = {
             'video': ['mp4','avi','webm'],
-            'imagen': ['png', 'jpg', 'jepg'],
+            'imagen': ['png', 'jpg', 'jepg', 'gif'],
             'audio': ['mp3']
             }
     for types in formats: # Itera sobre todos los tipos de archivos
@@ -72,10 +72,16 @@ async def index(request: Request):
     """
     return templates.TemplateResponse(
         name="index.html",
-        context={"saludo": "Hola"},
         request=request
     )
 
+@app.get("/get_cert")
+async def get_cert():
+    return FileResponse(
+            path="/project/certs/rootCA.pem",
+            filename="pasteAppCA.pem",
+            media_type="application/octet-stream"
+            )
 
 @app.get("/obt_publicKey")
 async def obt_publickey():
@@ -137,7 +143,6 @@ async def upload_chunk(
         cargar_nombre()
         await sio.emit("ult_archivo", archivo_name)
 
-        print(f"Subida completada con exito: {filename}")
         return {"status": "completed", "message": "archivo ensamblado", "filename": filename}
     return {"status": "chunk_saved", "chunkIndex":chunkIndex}
 
@@ -220,11 +225,9 @@ async def handle_txt_change(sid,data):
     texto = data
     await sio.emit("txt_recive_code", data)
     await sio.emit("txt_recive", data, skip_sid=sid)
-    print(data)
 
 @sio.on("conectado") # type: ignore
 async def handle_conectado(sid,data):
-    print(data,"="*20)
     await sio.emit("ult_archivo", archivo_name)
     await sio.emit("txt_recive", texto)
     tipo = tipo_de_archivo(archivo_name)
@@ -236,7 +239,6 @@ async def handle_conectado(sid,data):
 
 @sio.on('verificar_archivo_disponible') # type: ignore
 async def handle_verificar_archivo_disponible(sid):
-    print("Enviando archivo desde endpoint verificar_archivo_disponible")
     tipo = tipo_de_archivo(archivo_name)
     await sio.emit(
             'cargar_archivo',{

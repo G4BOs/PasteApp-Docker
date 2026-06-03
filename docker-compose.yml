@@ -5,6 +5,7 @@ services:
     volumes:
       - ./app/uploads:/project/app/uploads
       - static_content:/project/app/static
+      - ./certs:/project/certs
     expose:
       - "8000"
     restart: unless-stopped
