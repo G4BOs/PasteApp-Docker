@@ -22,6 +22,14 @@ jobs:
       - name: Push image
         run: docker push g4bos/pasteapp:latest
 
+      - name: Debug path
+        run: |
+          whoami
+          pwd
+          echo "HOME=$HOME"
+          ls -la /home/gabriel/apps/ || echo "Fallo el LS"
+          ls -la /home/gabriel/apps/PasteApp || echo "Fallo el LS2"
+
       - name: Deploy
         run: |
           cd /home/gabriel/apps/PasteApp
