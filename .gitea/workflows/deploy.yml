@@ -24,6 +24,6 @@ jobs:
 
       - name: Deploy
         run: |
-          cd "${{secrets.APP_PATH}}"
+          cd /home/gabriel/apps/PasteApp
           docker compose pull
           docker compose up -d
