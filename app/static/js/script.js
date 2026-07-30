@@ -30,7 +30,7 @@ const codigo =
 const txt_area =
   document.querySelector("#txt_area_paste");
 
-txt_area.innerText = navigator.userAgent;
+txt_area.value = navigator.userAgent;
 
 const progress_barr =
   document.querySelector("#progress_barr");
