@@ -11,6 +11,7 @@ from .moduls import wp_modul
 import shutil
 # ------------------------------------------------------------------/
 
+
 app = FastAPI()
 app.mount(
     "/static",
@@ -19,7 +20,9 @@ app.mount(
 )
 templates = Jinja2Templates(directory="app/templates")
 
+
 # ------------------------------------------------------------------|
+
 
 sio = socketio.AsyncServer(
     async_mode='asgi',
@@ -27,13 +30,20 @@ sio = socketio.AsyncServer(
 )
 combined_asgi_app = socketio.ASGIApp(sio,app)
 
+
 # ------------------------------------------------------------------|
+
+
 texto = ''
+
 archivo_name = ''
+
 
 # ******************************************************************|
 #                           FUNCTIONS
 # ******************************************************************|
+
+
 def cargar_nombre():
     global archivo_name
     try:
@@ -44,6 +54,9 @@ def cargar_nombre():
         with open("app/uploads/info.txt", "w") as f:
             f.write("Aun no hay archivos aqui")
 cargar_nombre()
+
+
+# ------------------------------------------------------------------|
 
 
 def tipo_de_archivo(archivo):
@@ -75,6 +88,10 @@ async def index(request: Request):
         request=request
     )
 
+
+# ------------------------------------------------------------------|
+
+
 @app.get("/get_cert")
 async def get_cert():
     return FileResponse(
@@ -83,17 +100,27 @@ async def get_cert():
             media_type="application/octet-stream"
             )
 
+
+# ------------------------------------------------------------------|
+
+
 @app.get("/obt_publicKey")
 async def obt_publickey():
     public_key = os.getenv("VAPID_PUBLIC_KEY")
     return {"public_key": public_key}
 
 
+# ------------------------------------------------------------------|
+
 
 @app.post("/suscribir")
 async def suscribir(request: Request):
     data = await request.json()
     wp_modul.suscribir(data)
+
+
+# ------------------------------------------------------------------|
+
 
 @app.post("/notificar")
 async def notificar(request: Request):
@@ -102,6 +129,7 @@ async def notificar(request: Request):
     wp_modul.notificar(mensaje)
 
 
+# ------------------------------------------------------------------|
 
 #@app.post("/upload")
 #async def upload(archivo: UploadFile = File(...) ):
@@ -112,7 +140,13 @@ async def notificar(request: Request):
 #    cargar_nombre()
 #    await sio.emit("ult_archivo", archivo_name)
 
+
+
 UPLOAD_DIR = "/project/app/uploads"
+
+
+# ------------------------------------------------------------------|
+
 
 @app.post("/upload-chunk")
 async def upload_chunk(
@@ -132,7 +166,10 @@ async def upload_chunk(
                 f.seek(chunkIndex*TAMANO_CHUNK)
             shutil.copyfileobj(archivo_chunk.file, f)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error escribiendo el fragmento {str(e)}")
+        raise HTTPException(
+                status_code=500,
+                detail=f"Error escribiendo el fragmento {str(e)}"
+                )
     finally:
         await archivo_chunk.close()
     
@@ -143,8 +180,18 @@ async def upload_chunk(
         cargar_nombre()
         await sio.emit("ult_archivo", archivo_name)
 
-        return {"status": "completed", "message": "archivo ensamblado", "filename": filename}
-    return {"status": "chunk_saved", "chunkIndex":chunkIndex}
+        return {
+                "status": "completed",
+                "message": "archivo ensamblado",
+                "filename": filename
+                }
+    return {
+            "status": "chunk_saved",
+            "chunkIndex":chunkIndex
+            }
+
+
+# ------------------------------------------------------------------|
 
 
 @app.get("/download")
@@ -153,9 +200,17 @@ async def download():
         with open("app/uploads/archivo", "rb") as f:
             while chunk := f.read(2048*2048):
                 yield chunk
-    headers = {"Content-Disposition": f'attachment; filename="{archivo_name}"'}
-    return StreamingResponse(iterar(), headers=headers, media_type="application/octet-stream")
+    headers = {
+            "Content-Disposition": f'attachment; filename="{archivo_name}"'
+            }
+    return StreamingResponse(
+            iterar(),
+            headers=headers,
+            media_type="application/octet-stream"
+            )
 
+
+# ------------------------------------------------------------------|
 
 
 @app.get("/video")
@@ -178,7 +233,7 @@ async def get_video(request: Request):
             f.seek(start)
             remaining = end - start + 1
             while remaining > 0:
-                chunk = f.read( min(1024*1024,remaining) )
+                chunk = f.read( min(2048*2048,remaining) )
                 if not chunk:
                     break
                 remaining -= len(chunk)
@@ -189,8 +244,15 @@ async def get_video(request: Request):
         "Content-Length": str(end-start+1),
     }
     status_code = 206 if range_header else 200
-    return StreamingResponse(iterar(),status_code=status_code,headers=headers,media_type="video/mp4")
+    return StreamingResponse(
+            iterar(),
+            status_code=status_code,
+            headers=headers,
+            media_type="video/mp4"
+            )
 
+    
+# ------------------------------------------------------------------|
 
 
 @app.get("/audio")
@@ -202,6 +264,9 @@ async def get_audio():
     return StreamingResponse(iterar(),media_type="audio/mpeg")
 
 
+# ------------------------------------------------------------------|
+
+
 @app.get("/imagen")
 def get_imagen():
     return FileResponse("app/uploads/archivo", filename=archivo_name)
@@ -210,14 +275,20 @@ def get_imagen():
 #                           SOCKET EVENTS
 # ******************************************************************|
 
+
 @sio.event
 async def connect(sid, environ):
     print(f"ID: {sid}")
-    await sio.emit("bienvenida", {"mensaje": "Conexión establecida con FastApi"}, room=sid)
+
 
 @sio.event
 async def disconnect(sid):
     print(f"Cliente desconectado: {sid}")
+
+
+
+# ------------------------------------------------------------------|
+
 
 @sio.on("txt_change") # type: ignore
 async def handle_txt_change(sid,data):
@@ -225,6 +296,11 @@ async def handle_txt_change(sid,data):
     texto = data
     await sio.emit("txt_recive_code", data)
     await sio.emit("txt_recive", data, skip_sid=sid)
+
+
+
+# ------------------------------------------------------------------|
+
 
 @sio.on("conectado") # type: ignore
 async def handle_conectado(sid,data):
@@ -236,6 +312,10 @@ async def handle_conectado(sid,data):
                 'tipo': tipo,
                 'ruta': f'/{tipo}'
                 },to=sid)
+
+
+# ------------------------------------------------------------------|
+
 
 @sio.on('verificar_archivo_disponible') # type: ignore
 async def handle_verificar_archivo_disponible(sid):
