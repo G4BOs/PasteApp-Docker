@@ -8,6 +8,7 @@ if ('ServiceWorker' in navigator) {
 };
 // Coneccion con SocketIo | o |
 
+
 let socket = io();
 
 let conectado = false;
@@ -28,6 +29,8 @@ const codigo =
 
 const txt_area =
   document.querySelector("#txt_area_paste");
+
+txt_area.innerText = navigator.userAgent;
 
 const progress_barr =
   document.querySelector("#progress_barr");
