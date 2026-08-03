@@ -46,6 +46,9 @@ contactos_fake = [
         {"id": 3, "nombre": "Robin", "fav": False}
         ]
 
+@app.get("/contactos")
+def get_contactos():
+    return contactos_fake
 
 # ******************************************************************|
 #                           FUNCTIONS
