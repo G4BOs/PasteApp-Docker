@@ -37,6 +37,14 @@ combined_asgi_app = socketio.ASGIApp(sio,app)
 texto = ''
 
 archivo_name = ''
+# ******************************************************************|
+#                          Endpoints de práctica
+# ******************************************************************|
+contactos_fake = [
+        {"id": 1,"nombre": "Gabriel","fav": False},
+        {"id": 2,"nombre": "Daniel", "fav": False},
+        {"id": 3, "nombre": "Robin", "fav": False}
+        ]
 
 
 # ******************************************************************|
