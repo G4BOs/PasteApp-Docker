@@ -1,5 +1,6 @@
 # ------------------------------------------------------------------\
 from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -13,6 +14,12 @@ import shutil
 
 
 app = FastAPI()
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+        )
 app.mount(
     "/static",
     StaticFiles(directory="app/static"),
