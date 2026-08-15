@@ -328,7 +328,8 @@ async def handle_conectado(sid,data):
     await sio.emit(
             'cargar_archivo',{
                 'tipo': tipo,
-                'ruta': f'/{tipo}'
+                'ruta': f'/{tipo}',
+                'nombre': archivo_name
                 },to=sid)
 
 
@@ -341,5 +342,6 @@ async def handle_verificar_archivo_disponible(sid):
     await sio.emit(
             'cargar_archivo',{
                 'tipo': tipo,
-                'ruta': f'/{tipo}'
+                'ruta': f'/{tipo}',
+                'nombre': archivo_name
                 },to=sid)
