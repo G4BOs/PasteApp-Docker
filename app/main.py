@@ -115,7 +115,7 @@ async def index(request: Request):
 
 @app.get("/React", response_class=HTMLResponse)
 async def index_react(request: Request):
-    return FileResponse("dist/index.html")
+    return FileResponse("app/dist/index.html")
 
 # ------------------------------------------------------------------|
 
