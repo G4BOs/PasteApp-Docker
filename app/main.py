@@ -27,9 +27,9 @@ app.mount(
 )
 
 app.mount(
-        "/dist",
-        StaticFiles(directory='app/dist'),
-        name="dist"
+        "/assets",
+        StaticFiles(directory='app/dist/assets'),
+        name="assets"
         )
 
 templates = Jinja2Templates(directory="app/templates")
