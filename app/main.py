@@ -28,7 +28,7 @@ app.mount(
 
 app.mount(
         "/dist",
-        StaticFiles(directory='dist'),
+        StaticFiles(directory='app/dist'),
         name="dist"
         )
 
