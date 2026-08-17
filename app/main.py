@@ -25,6 +25,13 @@ app.mount(
     StaticFiles(directory="app/static"),
     name="static"
 )
+
+app.mount(
+        "/dist",
+        StaticFiles(directory='dist'),
+        name="dist"
+        )
+
 templates = Jinja2Templates(directory="app/templates")
 
 
@@ -106,6 +113,9 @@ async def index(request: Request):
         request=request
     )
 
+@app.get("/React", response_class=HTMLResponse)
+async def index_react(request: Request):
+    return FileResponse("dist/index.html")
 
 # ------------------------------------------------------------------|
 
