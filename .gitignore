@@ -16,3 +16,4 @@ app/uploads
 #Certificados de mkcert
 certs/
 
+frontend/node_modules

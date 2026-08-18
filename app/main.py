@@ -28,7 +28,7 @@ app.mount(
 
 app.mount(
         "/assets",
-        StaticFiles(directory='app/dist/assets'),
+        StaticFiles(directory='app/static/build/assets'),
         name="assets"
         )
 
@@ -108,14 +108,16 @@ async def index(request: Request):
     """
     Ruta principal para cargar página de inicio
     """
-    return templates.TemplateResponse(
-        name="index.html",
-        request=request
-    )
+    return FileResponse("app/static/build/index.html")
 
-@app.get("/React", response_class=HTMLResponse)
-async def index_react(request: Request):
-    return FileResponse("app/dist/index.html")
+@app.get("/manifest.json")
+async def manifest(request: Request):
+    return FileResponse("app/static/manifest.json")
+
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse("app/static/sw.js",media_type='application/javascript')
+
 
 # ------------------------------------------------------------------|
 
