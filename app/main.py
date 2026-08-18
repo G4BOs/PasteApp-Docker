@@ -32,7 +32,7 @@ app.mount(
         name="assets"
         )
 
-templates = Jinja2Templates(directory="app/dist")
+templates = Jinja2Templates(directory="app/templates")
 
 
 # ------------------------------------------------------------------|
