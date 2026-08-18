@@ -6,7 +6,7 @@ function UploadFileArea() {
   //const archivoInfo = useSocketStore((s) => s.archivoInfo);
   const tipoArchivo = useSocketStore((s) => s.archivoInfo?.tipo)
 
-
+  const URL = ''
 
 
 
@@ -14,24 +14,24 @@ function UploadFileArea() {
     let contenido;
     switch (tipoArchivo) {
       case "video":
-        contenido = <video className="w-[60%]" src={`/video`} controls></video>;
+        contenido = <video className="w-[60%]" src={`${URL}/video`} controls></video>;
         break
       case "imagen":
-        contenido = <img className="w-[50%]" src={`/imagen`} />;
+        contenido = <img className="w-[50%] h-auto block m-auto" src={`${URL}/imagen`} />;
         break
       case "audio":
-        contenido = <audio className="max-h-[70]" src="/audio" controls />
+        contenido = <audio className="inline-block max-h-[70]" src={`${URL}/audio`} controls />
         break
       default:
         contenido = <div className="w-[50%] h-[200px]"></div>
     }
-    return contenido
+    return (<div className="h-[400px] content-center w-full overflow-auto">{contenido}</div>)
   }
 
   return (
     <div className="flex h-full flex-col">
 
-            <section className="flex flex-col font-bold items-center  gap-4 flex h-full ">
+            <section className="flex flex-col font-bold items-center  gap-2 flex h-full ">
 
         {Multimedia()}
 
