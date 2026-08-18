@@ -19,7 +19,7 @@ function FloatingFileSelector(){
           onChange={(e)=> setArchivoAct(e.target!.files![0])}
         />
         <Paperclip size={40} className="p-1 text-slate-500"/>
-      <label htmlFor="inputFile" className="">
+      <label htmlFor="inputFile" className="overflow-hidden">
         <span style={{width: `${porcentajeSubida}%`}} className={`bg-[#0f01] left-0 top-0 rounded-full h-full absolute`}>
         </span>
         <div className="flex flex-col align-center justify-center h-full">
@@ -30,7 +30,7 @@ function FloatingFileSelector(){
         hover:scale-105"
         onClick={()=> subir(archivoAct!)}
         >
-          <UploadIcon size={'30'}/>
+          <UploadIcon size={ archivoAct?.name ? '40' : "30" }/>
       </button>
 
       </section>
