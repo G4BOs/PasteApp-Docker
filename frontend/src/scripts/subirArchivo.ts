@@ -1,14 +1,16 @@
 import useUploadStore from "../hooks/useUploadStore";
 import { useSocketStore } from "../socket/store";
 
-const verificarArchivo = useSocketStore((s)=> s.verificarArchivo)
 
 function enviarChunk(formData: FormData) {
       return fetch('/upload-chunk', {
       method: 'POST',
       body: formData})}
 
-  async function subir(file: File) {
+
+async function subir(file: File) {
+
+    const socket = useSocketStore.getState().verificarArchivo;
     if (!file) return;
     const TAMANO_CHUNK = 5 * 1024 * 1024;
     const totalChunks = Math.ceil(file.size / TAMANO_CHUNK);
@@ -28,7 +30,7 @@ function enviarChunk(formData: FormData) {
       await enviarChunk(formData);
       const porcentaje = Math.round(((chunkIndex + 1) / totalChunks) * 100);
       useUploadStore.getState().setProgreso(porcentaje);
-      if (porcentaje == 100) {verificarArchivo()}
+      if (porcentaje == 100) { socket(); console.log("Enviado") }
       
   }};
 

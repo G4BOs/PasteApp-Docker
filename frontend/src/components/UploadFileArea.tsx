@@ -11,17 +11,17 @@ function UploadFileArea() {
 
 
 
-  function Multimedia() {
+  function Multimedia({tipo, nombre}:{tipo?: string, nombre?: string}) {
     let contenido;
-    switch (archivoInfo?.tipo) {
+    switch (tipo) {
       case "video":
-        contenido = <video className="w-[60%]" src={`${URL}/video`} controls></video>;
+        contenido = <video className="w-[60%]" src={`${URL}/video?v=${nombre}`} controls></video>;
         break
       case "imagen":
-        contenido = <img className="w-[50%] h-auto block m-auto" src={`${URL}/imagen`} />;
+        contenido = <img className="w-[50%] h-auto block m-auto" src={`${URL}/imagen?v=${nombre}`} />;
         break
       case "audio":
-        contenido = <audio className="inline-block max-h-[70]" src={`${URL}/audio`} controls />
+        contenido = <audio className="inline-block max-h-[70]" src={`${URL}/audio?v=${nombre}`} controls />
         break
       default:
         contenido = <div className="w-[50%] h-[200px]"></div>
@@ -34,7 +34,7 @@ function UploadFileArea() {
 
             <section className="flex flex-col font-bold items-center  gap-2 flex h-full ">
 
-        {Multimedia()}
+        <Multimedia tipo={archivoInfo?.tipo} nombre={archivoInfo?.nombre}/>
 
         <h1>{ultimoArchivo}</h1>
         <a href={`{URL}/download`}>
