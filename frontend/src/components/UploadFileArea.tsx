@@ -6,6 +6,7 @@ function UploadFileArea() {
   const archivoInfo = useSocketStore((s) => s.archivoInfo);
   //const tipoArchivo = useSocketStore((s) => s.archivoInfo?.tipo)
 
+
   const URL = ''//'https://192.168.88.221:8000'
 
 

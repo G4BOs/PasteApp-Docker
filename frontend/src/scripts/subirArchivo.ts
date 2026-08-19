@@ -1,5 +1,7 @@
 import useUploadStore from "../hooks/useUploadStore";
+import { useSocketStore } from "../socket/store";
 
+const verificarArchivo = useSocketStore((s)=> s.verificarArchivo)
 
 function enviarChunk(formData: FormData) {
       return fetch('/upload-chunk', {
@@ -25,7 +27,8 @@ function enviarChunk(formData: FormData) {
 
       await enviarChunk(formData);
       const porcentaje = Math.round(((chunkIndex + 1) / totalChunks) * 100);
-      useUploadStore.getState().setProgreso(porcentaje)
+      useUploadStore.getState().setProgreso(porcentaje);
+      if (porcentaje == 100) {verificarArchivo()}
       
   }};
 

@@ -7,6 +7,7 @@ interface SocketState {
   ultArchivo: string;
   archivoInfo: ArchivoInfo | null;
   enviarTexto: (texto: string) => void;
+  verificarArchivo: ()=> void;
 }
 
 export const useSocketStore = create<SocketState>((set) => {
@@ -32,6 +33,9 @@ export const useSocketStore = create<SocketState>((set) => {
     archivoInfo: null,
     enviarTexto: (texto) => {
       socket.emit("txt_change", texto)
+    },
+    verificarArchivo: ()=>{
+      socket.emit('verificar_archivo_disponible')
     }
   }
 })
