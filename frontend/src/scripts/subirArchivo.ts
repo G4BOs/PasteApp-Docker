@@ -1,9 +1,10 @@
 import useUploadStore from "../hooks/useUploadStore";
 import { useSocketStore } from "../socket/store";
+import { isDebugMode } from "../socket/socket";
 
 
 function enviarChunk(formData: FormData) {
-      return fetch('/upload-chunk', {
+      return fetch(isDebugMode ? 'https://192.168.88.221:8000/upload-chunk' : '/upload-chunk', {
       method: 'POST',
       body: formData})}
 
