@@ -27,7 +27,7 @@ function FloatingFileSelector(){
         </div>
       </label>
       <button disabled={false} className="disabled:bg-black p-2 text-green-400 transition-transform duration-200 ease-out active:scale-95 active:duration-0
-        hover:scale-105"
+        hover:scale-105 z-10"
         onClick={()=> subir(archivoAct!)}
         >
           <UploadIcon size={ archivoAct?.name ? '40' : "30" }/>
