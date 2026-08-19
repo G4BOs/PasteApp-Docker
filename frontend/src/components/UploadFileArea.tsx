@@ -3,16 +3,16 @@ import { useSocketStore } from "../socket/store";
 
 function UploadFileArea() {
   const ultimoArchivo = useSocketStore((s) => s.ultArchivo);
-  //const archivoInfo = useSocketStore((s) => s.archivoInfo);
-  const tipoArchivo = useSocketStore((s) => s.archivoInfo?.tipo)
+  const archivoInfo = useSocketStore((s) => s.archivoInfo);
+  //const tipoArchivo = useSocketStore((s) => s.archivoInfo?.tipo)
 
-  const URL = ''
+  const URL = ''//'https://192.168.88.221:8000'
 
 
 
   function Multimedia() {
     let contenido;
-    switch (tipoArchivo) {
+    switch (archivoInfo?.tipo) {
       case "video":
         contenido = <video className="w-[60%]" src={`${URL}/video`} controls></video>;
         break
@@ -36,7 +36,7 @@ function UploadFileArea() {
         {Multimedia()}
 
         <h1>{ultimoArchivo}</h1>
-        <a href="/download">
+        <a href={`{URL}/download`}>
         <DownloadIcon className="h-10 w-30 border rounded-full"/>
       </a>
       </section> 
