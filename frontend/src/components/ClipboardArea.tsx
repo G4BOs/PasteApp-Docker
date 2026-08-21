@@ -53,7 +53,8 @@ export default function ClipboardArea() {
 
         <button onClick={async ()=>{
             const text_paste = await navigator.clipboard.readText();
-            setText(text_paste)}} className={btn_styles}>
+            cambiarText(text_paste)}} 
+            className={btn_styles}>
           <ClipboardPaste size={30} />
         </button>
 

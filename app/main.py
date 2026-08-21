@@ -7,9 +7,10 @@ from fastapi.templating import Jinja2Templates
 import socketio
 import os
 from dotenv import load_dotenv
-load_dotenv()
+_ =load_dotenv()
 from .moduls import wp_modul
 import shutil
+from typing import Any
 # ------------------------------------------------------------------/
 
 
@@ -77,14 +78,14 @@ def cargar_nombre():
     except FileNotFoundError:
         archivo_name = ''
         with open("app/uploads/info.txt", "w") as f:
-            f.write("Aun no hay archivos aqui")
+            _ = f.write("Aun no hay archivos aqui")
 cargar_nombre()
 
 
 # ------------------------------------------------------------------|
 
 
-def tipo_de_archivo(archivo):
+def tipo_de_archivo(archivo: str):
     formats = {
             'video': ['mp4','avi','webm'],
             'imagen': ['png', 'jpg', 'jepg', 'gif'],
@@ -104,14 +105,14 @@ def tipo_de_archivo(archivo):
 
 # INDEX
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index():
     """
     Ruta principal para cargar página de inicio
     """
     return FileResponse("app/static/build/index.html")
 
 @app.get("/manifest.json")
-async def manifest(request: Request):
+async def manifest():
     return FileResponse("app/static/manifest.json")
 
 @app.get("/sw.js")
@@ -142,10 +143,9 @@ async def obt_publickey():
 
 # ------------------------------------------------------------------|
 
-
 @app.post("/suscribir")
 async def suscribir(request: Request):
-    data = await request.json()
+    data: dict[str, Any] = await request.json()
     wp_modul.suscribir(data)
 
 
